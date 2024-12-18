@@ -197,7 +197,7 @@ export const DATA = {
           icon: <Icons.youtube className="size-3" />,
         }
       ],
-      video: "/video/easydeploy.mp4",
+      video: "/video/easydeploy_480p.mp4",
       image: "",
     },
     {
@@ -225,7 +225,7 @@ export const DATA = {
           icon: <Icons.youtube className="size-3" />,
         }
       ],
-      video: "/video/eth.mp4",
+      video: "/video/eth_480p.mp4",
       image: "",
     },
     {
@@ -255,7 +255,7 @@ export const DATA = {
         }
       ],
       image: "",
-      video: "/video/vit.mp4",
+      video: "/video/vit_480p.mp4",
     },
     {
       title: "Business ERP Software",
@@ -283,7 +283,7 @@ export const DATA = {
           icon: <Icons.globe className="size-3" />,
         }
       ],
-      video: "/video/erp.mp4",
+      video: "/video/erp_480p.mp4",
       image: "",
     }
   ],
