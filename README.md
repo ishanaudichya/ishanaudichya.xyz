@@ -1,0 +1,1 @@
+Built with Next.js, TailwindCSS, ShadcnUI, Lucide Icons, TypeScript, and Vercel.
