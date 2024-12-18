@@ -34,12 +34,14 @@ export default function FunPage() {
                 <div className="group relative overflow-hidden rounded-lg border bg-background p-2">
                   <div className="flex flex-col space-y-2">
                     {game.imageUrl && (
-                      <div className="relative aspect-video overflow-hidden rounded-lg">
+                      <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
                         <Image
                           src={game.imageUrl}
                           alt={game.title}
                           fill
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          unoptimized
                         />
                       </div>
                     )}
