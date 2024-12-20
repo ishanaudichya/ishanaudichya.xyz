@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { games } from '@/data/fun';
 import BlurFade from '@/components/magicui/blur-fade';
 import { Badge } from '@/components/ui/badge';
+import { BorderBeam } from "@/components/ui/border-beam";
 
 export default function FunPage() {
   const BLUR_FADE_DELAY = 0.04;
@@ -32,6 +33,14 @@ export default function FunPage() {
             >
               <Link href={game.path}>
                 <div className="group relative overflow-hidden rounded-lg border bg-background p-2">
+                  <BorderBeam 
+                    duration={10}
+                    size={300}
+                    delay={id * 2}
+                    colorFrom="#e10995"
+                    colorTo="#1009fc"
+                  />
+                  
                   <div className="flex flex-col space-y-2">
                     {game.imageUrl && (
                       <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">

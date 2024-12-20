@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -10,6 +12,26 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import Markdown from "react-markdown";
+import BlurFade from "./magicui/blur-fade";
+import { useTheme } from "next-themes";
+import { DATA } from "@/data/resume";
+import { MagicCard } from "./ui/magic-card";
+import dynamic from 'next/dynamic'
+
+const BLUR_FADE_DELAY = 0.04;
+
+// Create a client-side only video component
+const VideoPlayer = dynamic(() => Promise.resolve(({ src, ...props }: { src: string } & React.VideoHTMLAttributes<HTMLVideoElement>) => (
+  <video
+    src={src}
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="pointer-events-none mx-auto h-40 w-full object-cover object-top"
+    {...props}
+  />
+)), { ssr: false })
 
 interface Props {
   title: string;
@@ -28,7 +50,7 @@ interface Props {
   className?: string;
 }
 
-export function ProjectCard({
+function ProjectCard({
   title,
   href,
   description,
@@ -41,38 +63,35 @@ export function ProjectCard({
   className,
 }: Props) {
   return (
-    <Card
+    <MagicCard
       className={
         "flex flex-col overflow-hidden border hover:shadow-lg transition-all duration-300 ease-out h-full"
       }
     >
-      <Link
-        href={href || "#"}
-        className={cn("block cursor-pointer", className)}
-      >
-        {video && (
-          <video
-            src={video}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="pointer-events-none mx-auto h-40 w-full object-cover object-top" // needed because random black line at bottom of video
-          />
-        )}
-        {image && (
-          <Image
-            src={image}
-            alt={title}
-            width={500}
-            height={300}
-            className="h-40 w-full overflow-hidden object-cover object-top"
-          />
-        )}
-      </Link>
+      {(href || video || image) && (
+        <div className={cn("block", className)}>
+          {video ? (
+            <VideoPlayer src={video} />
+          ) : image ? (
+            <Image
+              src={image}
+              alt={title}
+              width={500}
+              height={300}
+              className="h-40 w-full overflow-hidden object-cover object-top"
+            />
+          ) : null}
+        </div>
+      )}
       <CardHeader className="px-2">
         <div className="space-y-1">
-          <CardTitle className="mt-1 text-base">{title}</CardTitle>
+          {href ? (
+            <Link href={href}>
+              <CardTitle className="mt-1 text-base">{title}</CardTitle>
+            </Link>
+          ) : (
+            <CardTitle className="mt-1 text-base">{title}</CardTitle>
+          )}
           <time className="font-sans text-xs">{dates}</time>
           <div className="hidden font-sans text-xs underline print:visible">
             {link?.replace("https://", "").replace("www.", "").replace("/", "")}
@@ -111,6 +130,33 @@ export function ProjectCard({
           </div>
         )}
       </CardFooter>
-    </Card>
+    </MagicCard>
+  );
+}
+
+export function Projects() {
+  const { theme } = useTheme();
+
+  return (
+    <>
+      {DATA.projects.map((project, id) => (
+        <BlurFade
+          key={project.title}
+          delay={BLUR_FADE_DELAY * 12 + id * 0.05}
+        >
+          <ProjectCard
+            href={project.href}
+            key={project.title}
+            title={project.title}
+            description={project.description}
+            dates={project.dates}
+            tags={project.technologies}
+            image={project.image}
+            video={project.video}
+            links={project.links}
+          />
+        </BlurFade>
+      ))}
+    </>
   );
 }
