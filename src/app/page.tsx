@@ -165,7 +165,7 @@ export default function Page() {
           </div>
         </div>
       </section>
-      <section id="terminal" className="w-full max-w-2xl mx-auto">
+      <section className="w-full max-w-2xl mx-auto">
         <BlurFade delay={BLUR_FADE_DELAY * 12}>
           <Terminal className="relative h-64 w-full" />
         </BlurFade>

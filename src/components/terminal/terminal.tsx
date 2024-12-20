@@ -65,7 +65,7 @@ export function Terminal({ className, initialMessage = "Type 'help' to see avail
             '> ' + input,
             'Available games:',
             ...games.map(game => 
-              `${game.title}\n`
+              `${game.title} (${game.path.split('/').pop()})`
             ),
             'usage: game <game-name>' 
           ]);
@@ -82,11 +82,11 @@ export function Terminal({ className, initialMessage = "Type 'help' to see avail
           return;
         }
 
-        const gameExists = games.some(game => 
-          game.path.toLowerCase().includes(gameName.toLowerCase())
+        const game = games.find(game => 
+          game.path.split('/').pop() === gameName.toLowerCase()
         );
 
-        if (!gameExists) {
+        if (!game) {
           setHistory(prev => [
             ...prev, 
             '> ' + input, 
@@ -95,7 +95,7 @@ export function Terminal({ className, initialMessage = "Type 'help' to see avail
           return;
         }
 
-        router.push(`/fun/${gameName}`);
+        router.push(game.path);
       }
     },
     {
@@ -177,7 +177,6 @@ export function Terminal({ className, initialMessage = "Type 'help' to see avail
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent border-none outline-none px-2 font-mono text-sm"
-            autoFocus
           />
         </div>
       </div>
