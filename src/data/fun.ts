@@ -12,7 +12,7 @@ export const games: Game[] = [
     title: "Tic Tac Toe",
     description: "Classic two-player game of X's and O's. Challenge a friend or play against the computer!",
     path: "/fun/tic-tac-toe",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/tic-tac-toe.png",
     difficulty: "Easy",
     category: "Puzzle"
   },
@@ -20,7 +20,7 @@ export const games: Game[] = [
     title: "Memory Match",
     description: "Test your memory by matching pairs of cards. How fast can you clear the board?",
     path: "/fun/memory-match",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/memory-match.png",
     difficulty: "Medium",
     category: "Memory"
   },
@@ -28,7 +28,7 @@ export const games: Game[] = [
     title: "Word Scramble",
     description: "Unscramble letters to discover hidden words. Race against the clock!",
     path: "/fun/word-scramble",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/word-scramble.png",
     difficulty: "Medium",
     category: "Word"
   },
@@ -37,7 +37,7 @@ export const games: Game[] = [
     title: "Color Match",
     description: "Quick! Match the color with the word. But watch out - it's trickier than it seems!",
     path: "/fun/color-match",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/color-match.png",
     difficulty: "Easy",
     category: "Memory"
   },
@@ -45,7 +45,7 @@ export const games: Game[] = [
     title: "Simon Says",
     description: "Remember and repeat the pattern. How long a sequence can you remember?",
     path: "/fun/simon-says",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/simon-says.png",
     difficulty: "Medium",
     category: "Memory"
   },
@@ -53,7 +53,7 @@ export const games: Game[] = [
     title: "Speed Math",
     description: "Test your mental math skills against the clock. Multiple modes and difficulty levels!",
     path: "/fun/speed-math",
-    imageUrl: "https://placehold.co/1600x900",
+    imageUrl: "/thumbnail/speed-math.png",
     difficulty: "Hard",
     category: "Math"
   }
