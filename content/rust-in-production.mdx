@@ -1,0 +1,225 @@
+---
+title: "Why We Moved to Rust in Production: A Year-Long Journey"
+publishedAt: "2024-03-21"
+summary: "An honest look at our team's experience adopting Rust for production services, including the good, the bad, and the surprising wins we found along the way."
+---
+
+It's been exactly one year since we made the bold decision to rewrite our most critical microservice in Rust. Like many engineering teams, we were dealing with performance bottlenecks in our Node.js services, and the allure of Rust's promises was too strong to ignore. Here's our story, complete with code examples, benchmarks, and honest insights about what worked (and what didn't).
+
+## The Breaking Point
+
+Picture this: It's 2AM, and I'm getting paged because our payment processing service is having memory issues again. Our Node.js service was processing about 3,000 transactions per second during peak hours, and despite our best optimization efforts, we were seeing regular memory spikes that caused our containers to restart.
+
+Here's what our Node.js code looked like:
+
+```javascript
+async function processTransaction(transaction) {
+  const user = await db.users.findOne({ id: transaction.userId });
+  const enrichedData = await enrichTransactionData(transaction);
+  const validationResult = await validateTransaction(enrichedData);
+  
+  // Memory would pile up here during high load
+  const result = await processPayment(validationResult);
+  
+  // More async operations...
+  return result;
+}
+```
+
+## Enter Rust
+
+After much debate (and several more incidents), we decided to give Rust a try. Here's what the same logic looked like after our initial Rust rewrite:
+
+```rust
+async fn process_transaction(transaction: Transaction) -> Result<ProcessedPayment, PaymentError> {
+    let user = db::users::find_one(&transaction.user_id).await?;
+    let enriched_data = enrich_transaction_data(&transaction).await?;
+    let validation_result = validate_transaction(&enriched_data).await?;
+    
+    // Rust's ownership system ensures memory is freed as soon as it's no longer needed
+    let result = process_payment(validation_result).await?;
+    
+    Ok(result)
+}
+```
+
+## The Good Parts
+
+### 1. Performance Gains Were Real
+I was skeptical about the performance claims, but the numbers don't lie:
+
+```rust
+// Our production metrics after 6 months:
+// Node.js (Before):
+// - Average latency: 245ms
+// - Memory usage: 1.2GB - 2.8GB (varying)
+// - Requests/sec: ~3,000
+
+// Rust (After):
+// - Average latency: 23ms
+// - Memory usage: 180MB (stable)
+// - Requests/sec: ~12,000
+```
+
+### 2. Catching Bugs at Compile Time
+This was a game-changer. Remember those pesky `undefined is not a function` errors? Gone. Here's a real example from our codebase:
+
+```rust
+struct User {
+    id: String,
+    premium_until: Option<DateTime<Utc>>,
+}
+
+impl User {
+    fn is_premium(&self) -> bool {
+        match self.premium_until {
+            Some(date) => date > Utc::now(),
+            None => false
+        }
+    }
+}
+
+// The compiler forces us to handle all cases
+fn process_premium_feature(user: &User) -> Result<(), String> {
+    if user.is_premium() {
+        // Process premium feature
+        Ok(())
+    } else {
+        Err("User is not premium".to_string())
+    }
+}
+```
+
+## The Challenging Parts
+
+### 1. The Learning Curve Is Real
+Let me be honest - the first month was rough. The borrow checker felt like that strict teacher who wouldn't let anything slide. Here's an example that had us scratching our heads:
+
+```rust
+// ❌ Our first attempt
+struct OrderProcessor {
+    orders: Vec<Order>,
+}
+
+impl OrderProcessor {
+    fn process_all(&mut self) {
+        for order in &self.orders {
+            self.process_single(order); // Compiler: "Sorry, can't borrow `self` as mutable more than once!"
+        }
+    }
+}
+
+// ✅ What we learned to do instead
+impl OrderProcessor {
+    fn process_all(&mut self) {
+        let orders = self.orders.clone(); // Clone for iteration
+        for order in orders {
+            self.process_single(&order);
+        }
+    }
+}
+```
+
+### 2. Hiring Challenges
+Finding Rust developers was hard. We solved this by:
+1. Training our existing team (took about 3 months to get comfortable)
+2. Creating a detailed onboarding guide
+3. Accepting that some parts of our codebase would be learning experiments
+
+## Unexpected Wins
+
+### 1. Better Error Handling
+Rust's Result type forced us to think about error cases we were previously ignoring:
+
+```rust
+#[derive(Debug)]
+enum PaymentError {
+    InsufficientFunds(String),
+    InvalidCard(String),
+    NetworkError(String),
+}
+
+fn process_payment(amount: u32, card: Card) -> Result<Payment, PaymentError> {
+    if !card.is_valid() {
+        return Err(PaymentError::InvalidCard("Card validation failed".to_string()));
+    }
+    
+    match check_funds(amount) {
+        Ok(_) => {
+            // Process payment
+            Ok(Payment::new(amount, card))
+        }
+        Err(e) => Err(PaymentError::InsufficientFunds(e.to_string()))
+    }
+}
+```
+
+### 2. Fearless Refactoring
+The compiler became our pair programmer. When refactoring large portions of code, if it compiled, it usually worked. This was a massive confidence booster.
+
+## Real-world Performance Patterns
+
+Here are some patterns that worked really well for us:
+
+```rust
+// 1. Using channels for async communication
+use tokio::sync::mpsc;
+
+async fn payment_processor(mut receiver: mpsc::Receiver<Payment>) {
+    while let Some(payment) = receiver.recv().await {
+        tokio::spawn(async move {
+            process_payment(payment).await;
+        });
+    }
+}
+
+// 2. Connection pooling
+lazy_static! {
+    static ref DB_POOL: Pool<PostgresConnectionManager<NoTls>> = {
+        // Configure pool
+    };
+}
+
+// 3. Smart caching with TTL
+use moka::future::Cache;
+
+let cache: Cache<String, User> = Cache::builder()
+    .time_to_live(Duration::from_secs(300))
+    .build();
+```
+
+## Lessons Learned
+
+1. **Start Small**: Don't rewrite everything at once. We started with one microservice and expanded from there.
+
+2. **Invest in Testing**: Rust's type system is great, but you still need good tests:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    #[tokio::test]
+    async fn test_payment_processing() {
+        let payment = Payment::new(
+            Amount::from_dollars(50),
+            Card::test_card()
+        );
+        
+        let result = process_payment(payment).await;
+        assert!(result.is_ok());
+    }
+}
+```
+
+3. **Keep Learning**: We still discover better ways to do things. Last week, we learned about the `parking_lot` crate for more efficient mutex implementations.
+
+## Conclusion
+
+A year later, was it worth it? Absolutely. Our services are more reliable, our team is more confident in the code we ship, and we're handling 4x the traffic with 1/6th of the resources.
+
+But remember - Rust isn't magic. It's a tool that makes it harder to shoot yourself in the foot, but you can still shoot yourself in the foot if you try hard enough. The key is understanding your use case and being prepared for the learning curve.
+
+Next time, I'll share our experience setting up a proper monitoring stack for Rust microservices. Stay tuned!
+
+P.S. If you're considering Rust for production, feel free to reach out. I'm happy to share more specific details about our journey. 

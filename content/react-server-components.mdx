@@ -1,0 +1,163 @@
+---
+title: "Understanding React Server Components: A Deep Dive"
+publishedAt: "2024-03-20"
+summary: "A comprehensive guide to React Server Components, how they work, and why they're changing the way we build React applications."
+---
+
+React Server Components (RSC) represent a paradigm shift in how we build React applications. In this post, we'll explore what they are, why they matter, and how to use them effectively.
+
+## What Are Server Components?
+
+Server Components are React components that execute and render on the server. Unlike traditional React components, they never run on the client, which opens up new possibilities for performance and data access.
+
+```jsx
+// This is a Server Component
+async function UserProfile({ userId }) {
+  const user = await db.user.findFirst({ id: userId });
+  
+  return (
+    <div className="profile">
+      <h1>{user.name}</h1>
+      <span>{user.email}</span>
+    </div>
+  );
+}
+```
+
+## Key Benefits
+
+### 1. Zero Bundle Size
+Server Components are never sent to the client as JavaScript. Instead, only their rendered HTML is transmitted, resulting in smaller bundle sizes.
+
+### 2. Direct Backend Access
+Server Components can directly access backend resources:
+
+```jsx
+// ✅ This works in Server Components
+import { sql } from '@vercel/postgres';
+ 
+async function Posts() {
+  const posts = await sql`SELECT * FROM posts`;
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### 3. Enhanced Security
+Sensitive data and logic stay on the server:
+
+```jsx
+// API keys remain secure on the server
+const API_KEY = process.env.API_KEY;
+
+async function DataFetcher() {
+  const data = await fetch('https://api.example.com', {
+    headers: { Authorization: API_KEY }
+  });
+  return <div>{/* render data */}</div>;
+}
+```
+
+## Server vs. Client Components
+
+Here's a practical comparison:
+
+```jsx
+// Server Component
+async function ServerComponent() {
+  const data = await fetchDirectlyFromDatabase();
+  return <div>{data}</div>;
+}
+
+// Client Component
+'use client';
+function ClientComponent() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    // Must fetch through an API endpoint
+    fetch('/api/data').then(res => setData(res.data));
+  }, []);
+  
+  return <div>{data}</div>;
+}
+```
+
+## Best Practices
+
+1. **Default to Server Components**
+Start with Server Components and only switch to Client Components when needed for interactivity.
+
+2. **Smart Component Organization**
+```jsx
+// Layout.server.jsx - Server Component
+import { Header } from './Header.client';
+
+export default function Layout({ children }) {
+  return (
+    <div>
+      <Header /> {/* Interactive client component */}
+      {children} {/* Static server components */}
+    </div>
+  );
+}
+```
+
+3. **Data Fetching Patterns**
+```jsx
+async function ProductPage({ id }) {
+  const product = await getProduct(id);
+  
+  return (
+    <div>
+      <h1>{product.name}</h1>
+      <AddToCart client id={id} /> {/* Client interaction */}
+    </div>
+  );
+}
+```
+
+## Common Gotchas
+
+1. **No Hooks in Server Components**
+```jsx
+// ❌ This won't work
+function ServerComponent() {
+  const [count, setCount] = useState(0); // Error!
+  return <div>{count}</div>;
+}
+
+// ✅ Use Client Components for state
+'use client';
+function ClientComponent() {
+  const [count, setCount] = useState(0);
+  return <div>{count}</div>;
+}
+```
+
+2. **Async Component Handling**
+```jsx
+// ✅ Async Server Components work great
+async function AsyncServerComponent() {
+  const data = await fetch('...');
+  return <div>{data}</div>;
+}
+
+// ❌ Async Client Components aren't supported
+'use client';
+async function AsyncClientComponent() { // This won't work!
+  const data = await fetch('...');
+  return <div>{data}</div>;
+}
+```
+
+## Conclusion
+
+Server Components represent a significant evolution in React's architecture. They offer better performance, enhanced security, and simpler data access patterns. As you build your next React application, consider starting with Server Components by default and only reaching for Client Components when necessary.
+
+Remember: The future of React is server-first, but that doesn't mean client-side interactivity is going away. The key is finding the right balance for your application's needs. 
