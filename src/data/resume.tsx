@@ -42,9 +42,8 @@ export const DATA = {
       "React",
       "Next.js",
       "React Native",
-      "Typescript",
       "TailwindCSS",
-      "HTML/CSS",
+      "SWR",
     ],
     backend: [
       "Node.js",
@@ -125,7 +124,7 @@ export const DATA = {
       start: "October 2024",
       end: "Present",
       description:
-        "Hello",
+        "Developed client-side product flows and created user flows for various applications. Worked on Signmarkia, a decentralized e-signature tool, where I handled deployments and contributed to system architecture. Additionally, I implemented features for the statistics tab for the admin dashboard.",
     },
     {
       company: "Disney Graphics",
@@ -137,19 +136,19 @@ export const DATA = {
       start: "May 2024",
       end: "August 2024",
       description:
-        "Implemented a custom Kubernetes controller in Go to automate the deployment of MySQL and ProxySQL custom resources in order to enable 2,000+ internal developers to instantly deploy their app databases to production. Wrote several scripts in Go to automate MySQL database failovers while maintaining master-slave replication topologies and keeping Zookeeper nodes consistent with changes.",
+        "Led the development of a comprehensive e-commerce platform, which included creating a client panel for managing transactions and user interactions. Implemented payment processing systems, established deployment pipelines, and managed cluster configurations to ensure seamless operations. Additionally, designed a centralized admin dashboard to oversee all aspects of the platform efficiently.",
     },
     {
       company: "E Connect Solutions Pvt. Ltd.",
       href: "https://www.e-connectsolutions.com/",
       badges: [],
       location: "Jaipur, Rajasthan",
-      title: "Devops Intern -> Frontend Intern",
+      title: "DevOps Intern -> Frontend Intern",
       logoUrl: "/econ.png",
       start: "September 2023",
       end: "November 2023",
       description:
-        "Architected and wrote the entire MVP of the GeForce Now Cloud Gaming internal admin and A/B testing dashboard using React, Redux, TypeScript, and Python.",
+        "Developed 'RajSIMS' and 'XHRM' for the Rajasthan Government healthcare sector, role in creating responsive mobile applications, achieving a 95% user satisfaction rating across platforms. Enhanced application scalability by kubernetes and backend optimization with AWS, ",
     },
   ],
   education: [
