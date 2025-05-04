@@ -10,7 +10,7 @@ export const DATA = {
   description:
     "Software Developer from India. I love building things and exploring tech. Active on Github.",
   summary:
-    "I am about to join LegalForce Trademarkia as a Developer, I ve been persuing the dev stack for some time and love to make apps and doing interns at startups. I have a bachelors degree in computer science. As of right now I am trying to learn the T3 stack along with refining my system design concepts.",
+    "I work at LegalForce Trademarkia as a Developer, I ve been persuing the dev stack for some time and love to make apps and doing interns at startups. I have a bachelors degree in computer science. As of right now I am trying to learn the T3 stack along with refining my system design concepts.",
   avatarUrl: "/me.png",
   skillCategories: [
     {
